@@ -81,7 +81,7 @@ class ModelEv:
         specificity = 1 - (FP/(TN+FP))
         return accuracy, sensitivity, specificity
 
-    def plot(self, k, compute_sd=True, plot_sd=True):
+    def plot(self, k, compute_sd=True, plot_sd=True, export=False, export_path=None):
         if k not in self.results:
             self.evaluate(k, compute_sd)
 
@@ -101,9 +101,9 @@ class ModelEv:
         x_range = range(a.shape[0])
         
         fig, ax = plt.subplots()
-        ax.fill_between(x_range, a_m0, a_m1, alpha=0.05,color='tab:blue')
-        ax.fill_between(x_range, se_m0, se_m1, alpha=0.05,color='tab:green')
-        ax.fill_between(x_range, sp_m0, sp_m1, alpha=0.05,color='tab:orange')
+        ax.fill_between(x_range, a_m0, a_m1, alpha=0.4,color='tab:blue')
+        ax.fill_between(x_range, se_m0, se_m1, alpha=0.3,color='tab:green')
+        ax.fill_between(x_range, sp_m0, sp_m1, alpha=0.2,color='tab:orange')
         
         ax.plot(a,color='tab:blue')
         ax.plot(se,color='tab:green')
@@ -111,8 +111,12 @@ class ModelEv:
         ax.legend(['A','SE','SP', 'Std A', 'Std SE', 'Std SP'])
         ax.set_xlabel("Simulation timestep")
         ax.set_ylabel("Score")
-        # plt.show()
-        # plt.rcParams.update({'font.size': 15})
+        plt.rcParams.update({'font.size': 15})
+        if export and export_path is not None:
+            form = "pdf"
+            plt.savefig(export_path, format=form, dpi=1200,bbox_inches='tight')
+
+        plt.show()
 
 class ROC_Ev:
 
@@ -130,7 +134,7 @@ class ROC_Ev:
             if ex_id not in data:
                 data[ex_id] = {}
             
-            me = ModelEv(self.data_dir, "%s_%d"%(self.batch_id,n), ex_id)
+            me = ModelEv(self.data_dir, "%s"%(self.batch_id), ex_id)
             for k in k_range:
                 results = me.evaluate(k)
                 if end_ts is None:

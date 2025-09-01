@@ -12,6 +12,15 @@ try:
 except Exception as e:
     pass
 
+class DummyModel:
+
+    def __init__(self, number_of_agents):
+        self.no_ag = number_of_agents
+        self.pred = [0]*self.no_ag
+
+    def predict(self, data, counter):
+        return [0]*self.no_ag
+
 class ThresholdModel:
 
     def __init__(self, number_of_agents, threshold_file, stats_file, n, s, k=None,

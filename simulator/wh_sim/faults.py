@@ -37,11 +37,15 @@ class FaultySwarm(Swarm):
         self.faults[self.FAILED_BOX_PICKUP] = lookup
 
     # Simulate fault in picking up boxes
-    def set_agent_box_state(self, robot_id, state):
+    def set_agent_box_state(self, robot_id, state, dist):
         lookup = self.faults[self.FAILED_BOX_PICKUP]        
-
         if robot_id in list(lookup.keys()) and lookup[robot_id] <= self.counter:
             return False
+        
+        lookup2 = self.faults[self.REDUCED_CAMERA_RANGE]        
+        if robot_id in list(lookup2.keys()) and lookup2[robot_id] <= self.counter \
+            and self.camera_sensor_range_V[robot_id] < dist:
+                return False
 
         self.agent_has_box[robot_id] = state
         return True

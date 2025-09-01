@@ -25,6 +25,7 @@ class Warehouse:
 		self.check_collisions = check_collisions
 		self.box_is_free = np.ones(self.number_of_boxes) # Box states set to 1 = Free (not on a robots), if = 0 = Not free (on a robot)
 		self.delivered = 0 # Number of boxes that have been delivered 
+		self.delivery_log = []
 		self.counter = 0 # time starts at 0s or time step = 0 
 
 		# Initialise the positions of boxes and robots
@@ -100,8 +101,15 @@ class Warehouse:
 
 	def iterate(self, heading_bias=False, box_attraction=False): # moves the robot and box positions forward in one time step
 		dist_rob_to_box = cdist(self.box_c, self.rob_c) # calculates the euclidean distance from every robot to every box (centres)
-		is_closest_rob_in_range = np.min(dist_rob_to_box, 1) < self.box_range # if the minimum distance box-robot is less than the pick up sensory range, then qu_close_box = 1
-		closest_rob_id = np.argmin(dist_rob_to_box, 1)	
+		# add a mask if robots have faulty camera
+		no_faulty_cams = len(self.swarm.faults[4]) #TODO make less hacky
+		if no_faulty_cams > 0:
+			dist_rob_to_box[:no_faulty_cams,:] = 99999
+		
+		# first check if there exists a robot in range
+		closest_d = np.min(dist_rob_to_box, 1)
+		is_closest_rob_in_range = closest_d < self.box_range # if the minimum distance box-robot is less than the pick up sensory range, then qu_close_box = 1
+		closest_rob_id = np.argmin(dist_rob_to_box, 1)
 		boxes_to_pickup = self.is_box_free()*is_closest_rob_in_range
 		to_pickup = np.argwhere(boxes_to_pickup==1)
 
@@ -110,7 +118,7 @@ class Warehouse:
 			closest_r = closest_rob_id[box_id][0]
 			is_robot_carrying_box = self.is_robot_carrying_box(closest_r)
 			# Check if robot is already carrying a box: if not, then set robot to "lift" the box (may fail if faulty)
-			if is_robot_carrying_box == 0 and self.swarm.set_agent_box_state(closest_r, 1):
+			if is_robot_carrying_box == 0 and self.swarm.set_agent_box_state(closest_r, 1, closest_d[box_id][0]):
 				self.box_is_free[box_id] = 0 # change box state to 0 (not free, on a robot)
 				self.box_c[box_id] = self.rob_c[closest_r] # change the box centre so it is aligned with its robot carrier's centre
 				self.robot_carrier[box_id] = closest_r # set the robot_carrier for box b to that robot ID
@@ -135,6 +143,7 @@ class Warehouse:
 		self.boxes_in_dropoff = self.swarm.dropoff_box(self, active_boxes) # TODO does not include boxes which are inactive (already spawned in the drop off zone)
 		if any(self.boxes_in_dropoff) == 1: # if any boxes have been delivered
 			self.delivered = self.delivered + np.sum(self.boxes_in_dropoff) # add to the number of deliveries made
+			self.delivery_log.append(self.counter)
 			box_n = np.argwhere(self.boxes_in_dropoff == 1) # box IDs that have been delivered
 			rob_n = self.robot_carrier[box_n] # robot IDs that have delivered a box just now
 			self.rob_delivery_count[rob_n] += 1

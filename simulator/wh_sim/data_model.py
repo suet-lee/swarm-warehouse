@@ -185,13 +185,14 @@ class DataModel:
         dist = self.get_object_distance(obj_type)
         count = np.count_nonzero(~np.isnan(dist), axis=1)
         if obj_type == 1:
-            count = count-1 # don't count self
+            count = count-1 # don't count self # if faulty, it may not detect itself so cap min at 0
+            count[count<0] = 0
         return count
 
     # obj_type: 0 box, 1 agent, 2 wall
     def get_nearest_object(self, obj_type=0):
         dist = self.get_object_distance(obj_type)
-        foo = 99999
+        foo = 100#99999
         dist[np.isnan(dist)] = foo
         # don't count self or any box currently lifted
         # if obj_type in [0, 1]:
@@ -231,7 +232,7 @@ class DataModel:
             nearest_wall = nearest_arr[2]
 
         dist = np.array([nearest_box[0], nearest_agent[0], nearest_wall[0]])
-        foo = 99999
+        foo = 100#99999
         dist[np.isnan(dist)] = foo
         md = np.min(dist, axis=0)
         md[md==foo] = np.nan
@@ -479,13 +480,14 @@ class MinimalDataModel(DataModel):
         dist = self.get_object_distance(ag_id, obj_type)
         count = np.count_nonzero(~np.isnan(dist))
         if obj_type == 1:
-            count = count-1 # don't count self
+            count = count-1 # don't count self # if faulty, it may not detect itself so cap min at 0
+            count[count<0] = 0
         return count
     
     # obj_type: 0 box, 1 agent, 2 wall
     def get_nearest_object(self, ag_id, obj_type=0):
         dist = self.get_object_distance(ag_id, obj_type)
-        foo = 99999
+        foo = 100#99999
         dist[np.isnan(dist)] = foo
         # don't count self or any box currently lifted
         # if obj_type in [0, 1]:
@@ -516,7 +518,7 @@ class MinimalDataModel(DataModel):
             nearest_wall = nearest_arr[2]
 
         dist = np.array([nearest_box[0], nearest_agent[0], nearest_wall[0]])
-        foo = 99999
+        foo = 100#99999
         dist[np.isnan(dist)] = foo
         md = np.min(dist)
         dist_idx = np.array([nearest_box[1], nearest_agent[1], nearest_wall[1]])
@@ -712,3 +714,40 @@ class ExtremeMinDataModel(MinimalDataModel):
             export_d['f'] = f
         
         return pd.DataFrame(export_d)
+    
+class ExportFootprintData(DataModel):
+    
+    metrics = [
+    #     'no_boxes',
+    #     'no_robots',
+    #     'box_coords',
+        'robot_coords',
+        # 'boxes_to_be_delivered',
+        # 'camera_range'
+    ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.df = []
+
+    def get_metric_data(self, warehouse):
+        self.swarm = warehouse.swarm
+        self.warehouse = warehouse
+
+        self.metric_data = {
+            # 'no_boxes': warehouse.number_of_boxes,
+            # 'no_robots': swarm.number_of_agents,
+            # 'box_coords': json.dumps(warehouse.box_c.tolist()),
+            'robot_coords': self.warehouse.rob_c.tolist(),
+            # 'boxes_to_be_delivered': json.dumps(warehouse.to_be_delivered.tolist()),
+            # 'fault_count': json.dumps(swarm.fault_count),
+            # 'camera_range': json.dumps(swarm.camera_sensor_range_V.tolist())
+        }
+
+        if self.store_internal:
+            self.df.append(self.metric_data['robot_coords'])
+
+        return self.metric_data
+    
+    def get_dataframe(self):
+        return pd.DataFrame(self.df)

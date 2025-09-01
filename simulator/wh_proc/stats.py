@@ -153,6 +153,13 @@ class ThreshProc:
         for sample_file in os.listdir(self.load_dir):
             filepath = os.path.join(self.load_dir, sample_file)
             df = pd.read_csv(filepath)
+            if sample_file in [
+                "nearest_agent_distance.csv",
+                "nearest_box_distance.csv",
+                "nearest_wall_distance.csv",
+                "nearest_combined_distance.csv"
+            ]:
+                df.fillna(100,inplace=True)
             n = df['n'].mean()
             f = df['f'].mean()
             t = (n+f)/2
