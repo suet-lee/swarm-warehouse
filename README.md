@@ -2,7 +2,7 @@
 
 The code in this repository simulates an intralogistics task for a robot swarm. The robots operate in a 500 by 500 centimeter bounded arena, referred to as the warehouse: the task is to retrieve and deliver them to the drop-off zone (a 25cm-wide vertical strip extending along the length of the right-hand wall). The simulator provides tools for data generation for fault detection.
 
-This simulator supports the work published at: 10.1109/LRA.2022.3189789 
+This simulator supports the work published at: [10.1109/LRA.2022.3189789 ](https://doi.org/10.1109/LRA.2022.3189789)
 
 ### Requirements
 
