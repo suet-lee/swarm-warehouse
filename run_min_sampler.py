@@ -1,7 +1,7 @@
 from simulator.wh_proc import *
 from simulator.wh_sim import DataModel
 
-batch_id = "test"
+batch_id = "sampler_minimal"
 ex_ids = ['e_1', 'e_2', 'e_3', 'e_4', 'e_5', 'e_6']
 data_dir = "data"
 metrics = DataModel.metrics + DataModel.roc_metrics

@@ -21,12 +21,13 @@ cfg_obj = Config(cfg_file, default_cfg_file, ex_id=ex_id)
 ###### Functions ######
 
 def gen_random_seed(iteration, faults):
-    P1 = 33331
-    P2 = 73
-    a = 1
-    b = int(ex_id.split("_")[1]) + faults
-    c = iteration
-    return (a*P1 + b)*P2 + c
+    global it_offset
+    P1 = 1000000
+    P2 = 10000
+    a = int(ex_id.split("_")[1])
+    b = faults[0]
+    c = iteration + it_offset
+    return a*P1 + b*P2 + c
 
 def iterate_ex(iterations, faults, st, export_data=True):
     for i in range(iterations):

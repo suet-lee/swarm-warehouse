@@ -5,17 +5,21 @@ import multiprocessing as mp
 import argparse
 import time
 
+######
+
+
+
 ###### Experiment parameters ######
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--ex_id')
-parser.add_argument('--iterations')
-parser.add_argument('--it_offset')
-parser.add_argument('--export_data')
-parser.add_argument('--verbose')
-parser.add_argument('--faults')
-parser.add_argument('--batch_id')
-parser.add_argument('--cores')
+parser.add_argument('--ex_id') # Set the experiment ID
+parser.add_argument('--iterations') # Set the number of iterations
+parser.add_argument('--it_offset') # Set the offset in iterations starting point
+parser.add_argument('--export_data')  # Export data
+parser.add_argument('--verbose')  # Set verbosity
+parser.add_argument('--faults') # Set the number of faults
+parser.add_argument('--batch_id') # Set the batch ID (for exporting data)
+parser.add_argument('--cores') # Set the number of cores
 
 args = parser.parse_args()
 ex_id = args.ex_id
@@ -23,7 +27,7 @@ iterations = int(args.iterations)
 it_offset = int(args.it_offset)
 export_data = bool(args.export_data)
 verbose = bool(int(args.verbose))
-faults = [int(args.faults)]
+fault_range = [int(args.faults)]
 batch_id = args.batch_id
 cores = int(args.cores)
 
@@ -35,25 +39,25 @@ cores = int(args.cores)
 # export_data = True
 # verbose = False    
 # fault_range = range(11) # inject 0-10 faults
-# batch_id = 'final'
-# cores = 2
+# batch_id = 'export_batch_id'
+# cores = 1
 
 ###### Config class ######
 
-default_cfg_file = CFG_FILES['default']
-cfg_file = CFG_FILES['ex_1']
+default_cfg_file = CFG_FILES['default'] # Set default config file for experiment
+cfg_file = CFG_FILES['ex_1'] # Set experiment config file
 cfg_obj = Config(cfg_file, default_cfg_file, ex_id=ex_id)
 
 ###### Functions ######
 
 def gen_random_seed(iteration, faults):
     global it_offset
-    P1 = 33331
-    P2 = 73
-    a = 1
-    b = int(ex_id.split("_")[1]) + faults[0]
+    P1 = 1000000
+    P2 = 10000
+    a = int(ex_id.split("_")[1])
+    b = faults[0]
     c = iteration + it_offset
-    return (a*P1 + b)*P2 + c
+    return a*P1 + b*P2 + c
 
 def gen_batches(iterations, no_procs):
     per_batch = int(iterations/no_procs)
