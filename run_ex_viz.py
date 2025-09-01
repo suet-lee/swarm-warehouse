@@ -16,7 +16,8 @@ cfg_obj = Config(cfg_file, default_cfg_file, ex_id=ex_id)
 
 ###### Functions ######
 
-# data_model = None # 
+data_model = DummyDataModel()
+# data_model = DataModel()
 thresh_file = None#os.path.join(MODEL_ROOT, "%s_%s.txt"%(ex_id, "threshold_file"))
 stats_file = None#os.path.join(STATS_ROOT, "%s_%s.txt"%(ex_id, "stats_file"))
 
@@ -28,7 +29,7 @@ ad_model = DummyModel(cfg_obj.warehouse.get('number_of_agents'))
 
 # Create simulator object
 sim = VizSim(cfg_obj,
-    # data_model=data_model,
+    data_model=data_model,
     fault_count=faults,
     ad_model=ad_model,
     random_seed=66764970)

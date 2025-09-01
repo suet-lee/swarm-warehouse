@@ -286,6 +286,15 @@ class DataModel:
         
         return np.array(counts)
 
+class DummyDataModel:
+
+    def __init__(self, *args, **kwargs):
+        self.metric_data = []
+
+    def get_metric_data(self, *args, **kwargs):
+        return
+
+
 class ExportRedisData(DataModel):
     
     vis_keys = [

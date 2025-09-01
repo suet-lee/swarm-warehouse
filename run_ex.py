@@ -5,12 +5,12 @@ import time
 
 ###### Experiment parameters ######
 
-ex_id = 'e_1'
-iterations = 200
-export_data = True
-verbose = False    
+ex_id = 'e_1' # Set the experiment ID
+iterations = 200 # Set the number of iterations
+export_data = True # Export data
+verbose = False    # Set verbosity
 fault_range = range(11) # inject 0-10 faults
-batch_id = 'test'
+batch_id = 'test' # Set the batch ID (for exporting data)
 
 ###### Config class ######
 

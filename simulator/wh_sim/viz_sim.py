@@ -11,7 +11,7 @@ class VizSim(Simulator):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.faulty = self.fault_count[0] > 0
-        self.snapshot_s = [1]#[50,1250,2250]
+        self.snapshot_s = []#[50,1250,2250]
 
     def generate_dot_positional_data(self, faulty=False):
         if faulty:
@@ -77,12 +77,13 @@ class VizSim(Simulator):
         y_data = []
         for i in range(self.swarm.number_of_agents):
             is_faulty = self.ad_model.pred[i]
+            print(is_faulty)
             if is_faulty:
-                x = self.warehouse.rob_c[i,0]
-                y = self.warehouse.rob_c[i,1]
+                x = [self.warehouse.rob_c[i,0]]
+                y = [self.warehouse.rob_c[i,1]]
             else:
-                x = out_of_arena[0]
-                y = out_of_arena[1]
+                x = [out_of_arena[0]]
+                y = [out_of_arena[1]]
             
             x_data.append(x)
             y_data.append(y)
@@ -140,7 +141,7 @@ class VizSim(Simulator):
                 fault_c[i].set_data(fc_x_vec[i], fc_y_vec[i])
 
         realtime = int(np.ceil(counter/50))
-        # plt.title("Time is "+str(realtime)+"s")
+        plt.title("Time is "+str(realtime)+"s")
 
     def take_snapshot(self, counter):
         if counter not in self.snapshot_s:
@@ -201,7 +202,7 @@ class VizSim(Simulator):
         cam_range, = ax.plot(
             [self.warehouse.rob_c[i,0] for i in range(self.cfg.get('warehouse', 'number_of_agents'))],
             [self.warehouse.rob_c[i,1] for i in range(self.cfg.get('warehouse', 'number_of_agents'))], 
-            'ko', 
+            'o', 
             markersize = cam_range_marker_size,
             # linestyle=":",
             color="#f2f2f2",
@@ -229,7 +230,7 @@ class VizSim(Simulator):
         fault_c = {}
         if fc_x_vec is not None and fc_y_vec is not None:
             for i in range(self.swarm.number_of_agents):
-                fault_c[i], = ax.plot(fc_x_vec[i], fc_y_vec[i], "ko", markersize=marker_size+2, 
+                fault_c[i], = ax.plot(fc_x_vec[i], fc_y_vec[i], "o", markersize=marker_size+2, 
                     linewidth=2, color="r", fillstyle="none")
 
         plt.axis('square')
@@ -238,7 +239,7 @@ class VizSim(Simulator):
         self.anim = animation.FuncAnimation(fig, self.iterate, 
             frames=10000, 
             interval=0.1, 
-            save_count=sys.maxsize,
+            # save_count=sys.maxsize,
             fargs=(dot, box, h_line, fault_c, cam_range))
 
         plt.xlabel("Warehouse width (cm)")

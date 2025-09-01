@@ -19,7 +19,8 @@ class DummyModel:
         self.pred = [0]*self.no_ag
 
     def predict(self, data, counter):
-        return [0]*self.no_ag
+        self.pred = [0]*self.no_ag
+        return self.pred
 
 class ThresholdModel:
 

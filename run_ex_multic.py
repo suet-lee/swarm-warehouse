@@ -5,10 +5,6 @@ import multiprocessing as mp
 import argparse
 import time
 
-######
-
-
-
 ###### Experiment parameters ######
 
 parser = argparse.ArgumentParser()
